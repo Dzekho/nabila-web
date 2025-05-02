@@ -1,14 +1,11 @@
-const apiKey = 'sk-abc123xyz456...'; // Gantilah dengan API key yang valid dari OpenAI
+// Memuat dotenv untuk membaca file .env
+require('dotenv').config();
 
-async function sendMessage() {
-  const input = document.getElementById("user-input");
-  const chatBox = document.getElementById("chat-box");
-  const userMessage = input.value;
-  if (!userMessage.trim()) return;
+// Ambil API key dari .env
+const apiKey = process.env.OPENAI_API_KEY;
 
-  chatBox.innerHTML += `<p><strong>You:</strong> ${userMessage}</p>`;
-  input.value = "";
-
+// Fungsi untuk mengirim pesan ke API OpenAI
+async function sendMessage(message) {
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -17,22 +14,15 @@ async function sendMessage() {
     },
     body: JSON.stringify({
       model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: userMessage }]
+      messages: [{ role: "user", content: message }]
     })
   });
 
   const data = await response.json();
-  const reply = data.choices?.[0]?.message?.content || "Sorry, I didn't get that.";
-  chatBox.innerHTML += `<p><strong>Nabila:</strong> ${reply}</p>`;
-  chatBox.scrollTop = chatBox.scrollHeight;
+  return data.choices?.[0]?.message?.content || "Maaf, aku tidak mengerti.";
 }
 
-document.getElementById("user-input").addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    sendMessage();
-  }
-});
-
-document.getElementById("reset-button").addEventListener("click", function() {
-  document.getElementById("chat-box").innerHTML = "";
+// Uji fungsi dengan mengirimkan pesan
+sendMessage("Hello, Nabila!").then(reply => {
+  console.log("Reply:", reply);
 });
