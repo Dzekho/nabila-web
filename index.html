@@ -1,44 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Nabila</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        #chat-box { max-height: 400px; overflow-y: auto; margin-bottom: 10px; }
-        #user-input { width: 300px; padding: 10px; }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Nabila - AI Chat</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    #chat-box { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
+    input { width: 80%; padding: 10px; }
+    button { padding: 10px; }
+  </style>
 </head>
 <body>
-    <h1>Chat dengan Nabila</h1>
-    <div id="chat-box"></div>
-    <input type="text" id="user-input" placeholder="Tulis pesan..." />
-    <button onclick="sendMessage()">Kirim</button>
+  <h1>Halo, aku Nabila!</h1>
+  <div id="chat-box"></div>
+  <input id="user-input" type="text" placeholder="Tulis pesan di sini..." />
+  <button onclick="sendMessage()">Kirim</button>
 
-    <script>
-        async function sendMessage() {
-            const input = document.getElementById("user-input");
-            const chatBox = document.getElementById("chat-box");
-            const userMessage = input.value;
-            if (!userMessage.trim()) return;
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("user-input");
+      const chatBox = document.getElementById("chat-box");
+      const userMessage = input.value;
+      if (!userMessage.trim()) return;
 
-            chatBox.innerHTML += `<p><strong>Kamu:</strong> ${userMessage}</p>`;
-            input.value = "";
+      chatBox.innerHTML += `<p><strong>Kamu:</strong> ${userMessage}</p>`;
+      input.value = "";
 
-            const response = await fetch("http://localhost:3000/chat", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ message: userMessage })
-            });
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userMessage })
+      });
 
-            const data = await response.json();
-            const reply = data.choices?.[0]?.message?.content || "Maaf, aku tidak mengerti.";
-            chatBox.innerHTML += `<p><strong>Nabila:</strong> ${reply}</p>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    </script>
+      const data = await response.json();
+      const reply = data.reply || "Maaf, aku tidak mengerti.";
+      chatBox.innerHTML += `<p><strong>Nabila:</strong> ${reply}</p>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
 </body>
 </html>
