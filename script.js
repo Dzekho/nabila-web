@@ -1,19 +1,19 @@
-// api-proxy.js
-const express = require("express");
-const fetch = require("node-fetch");
-require("dotenv").config();
+const apiKey = 'sk-abc123xyz456...'; // Gantilah dengan API key yang valid dari OpenAI
 
-const app = express();
-app.use(express.json());
+async function sendMessage() {
+  const input = document.getElementById("user-input");
+  const chatBox = document.getElementById("chat-box");
+  const userMessage = input.value;
+  if (!userMessage.trim()) return;
 
-app.post("/api/chat", async (req, res) => {
-  const userMessage = req.body.message;
+  chatBox.innerHTML += `<p><strong>You:</strong> ${userMessage}</p>`;
+  input.value = "";
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+      "Authorization": `Bearer ${apiKey}`
     },
     body: JSON.stringify({
       model: "gpt-3.5-turbo",
@@ -22,9 +22,17 @@ app.post("/api/chat", async (req, res) => {
   });
 
   const data = await response.json();
-  const reply = data.choices?.[0]?.message?.content || "Maaf, ada kesalahan.";
-  res.json({ reply });
+  const reply = data.choices?.[0]?.message?.content || "Sorry, I didn't get that.";
+  chatBox.innerHTML += `<p><strong>Nabila:</strong> ${reply}</p>`;
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+document.getElementById("user-input").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    sendMessage();
+  }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Proxy aktif di http://localhost:${PORT}`));
+document.getElementById("reset-button").addEventListener("click", function() {
+  document.getElementById("chat-box").innerHTML = "";
+});
