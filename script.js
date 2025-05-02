@@ -1,26 +1,41 @@
+// server/server.js
+
+require('dotenv').config();
 const express = require('express');
-const brain = require('brain.js');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const { OpenAI } = require('openai');
+
 const app = express();
-const net = new brain.NeuralNetwork();
+const PORT = 3000;
 
-app.use(express.json());
+// Setup middleware
+app.use(cors());
+app.use(bodyParser.json());
 
-// Melatih model
-net.train([
-  { input: [0, 0], output: [0] },
-  { input: [0, 1], output: [1] },
-  { input: [1, 0], output: [1] },
-  { input: [1, 1], output: [0] }
-]);
-
-// Endpoint untuk prediksi
-app.post('/predict', (req, res) => {
-  const input = req.body.input;
-  const output = net.run(input);
-  res.json({ output });
+// Setup OpenAI
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
 });
 
-// Jalankan server
-app.listen(3000, () => {
-  console.log('Server berjalan di http://localhost:3000');
+// Endpoint untuk menerima permintaan chat dari frontend
+app.post('/api/chat', async (req, res) => {
+  const { message } = req.body;
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: message }]
+    });
+
+    const reply = response.choices[0].message.content;
+    res.json({ reply });
+  } catch (err) {
+    console.error("Gagal memproses permintaan:", err.message);
+    res.status(500).json({ error: 'Terjadi kesalahan.' });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server berjalan di http://localhost:${PORT}`);
 });
