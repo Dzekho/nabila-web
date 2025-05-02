@@ -1,42 +1,22 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Nabila - AI Chat</title>
-  <style>
-    body { font-family: Arial; padding: 20px; }
-    #chat-box { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
-    input { width: 80%; padding: 10px; }
-    button { padding: 10px; }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nabila - AI Assistant</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Halo, aku Nabila!</h1>
-  <div id="chat-box"></div>
-  <input id="user-input" type="text" placeholder="Tulis pesan di sini..." />
-  <button onclick="sendMessage()">Kirim</button>
+  <div class="chat-container">
+    <header>
+      <h1>Nabila</h1>
+      <p>AI Assistant</p>
+    </header>
+    <div class="chat-box" id="chat-box"></div>
+    <input type="text" id="user-input" placeholder="Type your message...">
+    <button id="reset-button">Reset Chat</button>
+  </div>
 
-  <script>
-    async function sendMessage() {
-      const input = document.getElementById("user-input");
-      const chatBox = document.getElementById("chat-box");
-      const userMessage = input.value;
-      if (!userMessage.trim()) return;
-
-      chatBox.innerHTML += `<p><strong>Kamu:</strong> ${userMessage}</p>`;
-      input.value = "";
-
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage })
-      });
-
-      const data = await response.json();
-      const reply = data.reply || "Maaf, aku tidak mengerti.";
-      chatBox.innerHTML += `<p><strong>Nabila:</strong> ${reply}</p>`;
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
