@@ -1,28 +1,26 @@
-// Memuat dotenv untuk membaca file .env
-require('dotenv').config();
+const express = require('express');
+const brain = require('brain.js');
+const app = express();
+const net = new brain.NeuralNetwork();
 
-// Ambil API key dari .env
-const apiKey = process.env.OPENAI_API_KEY;
+app.use(express.json());
 
-// Fungsi untuk mengirim pesan ke API OpenAI
-async function sendMessage(message) {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: message }]
-    })
-  });
+// Melatih model
+net.train([
+  { input: [0, 0], output: [0] },
+  { input: [0, 1], output: [1] },
+  { input: [1, 0], output: [1] },
+  { input: [1, 1], output: [0] }
+]);
 
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content || "Maaf, aku tidak mengerti.";
-}
+// Endpoint untuk prediksi
+app.post('/predict', (req, res) => {
+  const input = req.body.input;
+  const output = net.run(input);
+  res.json({ output });
+});
 
-// Uji fungsi dengan mengirimkan pesan
-sendMessage("Hello, Nabila!").then(reply => {
-  console.log("Reply:", reply);
+// Jalankan server
+app.listen(3000, () => {
+  console.log('Server berjalan di http://localhost:3000');
 });
