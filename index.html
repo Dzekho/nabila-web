@@ -1,19 +1,118 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nabila AI Assistant</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nabila - AI Assistant</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #2a2a2a;
+      color: white;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    #chat-box {
+      width: 100%;
+      max-width: 600px;
+      height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 10px;
+      background-color: #333;
+      margin-bottom: 20px;
+    }
+    #chat-box p {
+      margin: 5px 0;
+    }
+    .user-message {
+      color: #0af;
+    }
+    .ai-message {
+      color: #f0f;
+    }
+    #user-input {
+      width: 100%;
+      max-width: 600px;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: none;
+      background-color: #444;
+      color: white;
+    }
+    #send-btn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #0af;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    #send-btn:hover {
+      background-color: #00d0d0;
+    }
+  </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div id="chat-box" class="chat-box"></div>
-        <div class="input-container">
-            <input type="text" id="user-input" placeholder="Tanya aku apa saja..." />
-            <button id="send-btn">Kirim</button>
-        </div>
-    </div>
-    <script src="script.js"></script>
+  <h1>Nabila - AI Assistant</h1>
+  <div id="chat-box"></div>
+  <input type="text" id="user-input" placeholder="Ketik pesanmu..." />
+  <button id="send-btn">Kirim</button>
+
+  <script>
+    const sendButton = document.getElementById('send-btn');
+    const inputField = document.getElementById('user-input');
+    const chatBox = document.getElementById('chat-box');
+
+    sendButton.addEventListener('click', async () => {
+      const userMessage = inputField.value.trim();
+      if (userMessage) {
+        // Tampilkan pesan dari user
+        chatBox.innerHTML += `<p class="user-message"><strong>Kamu:</strong> ${userMessage}</p>`;
+
+        // Bersihkan input field
+        inputField.value = '';
+
+        // Kirim pesan ke OpenAI (tuliskan kode fetch atau API sesuai kebutuhan)
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer YOUR_API_KEY_HERE`, // Ganti dengan API Key kamu
+          },
+          body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [{ role: 'user', content: userMessage }],
+          }),
+        });
+
+        const data = await response.json();
+        const aiReply = data.choices[0]?.message?.content || 'Maaf, aku tidak mengerti.';
+
+        // Tampilkan balasan dari AI
+        chatBox.innerHTML += `<p class="ai-message"><strong>Nabila:</strong> ${aiReply}</p>`;
+
+        // Scroll ke bawah chat
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    });
+
+    // Agar bisa kirim dengan tombol Enter
+    inputField.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendButton.click();
+      }
+    });
+  </script>
 </body>
 </html>
